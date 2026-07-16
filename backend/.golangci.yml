@@ -1,0 +1,25 @@
+version: "2"
+
+linters:
+  enable:
+    - revive # Linter for Go source code
+    - gocritic # Check additional correctness, performance, and style issues
+    - errcheck # Check for unchecked errors in Go code
+    - gosec # Golang security checker
+
+    - bodyclose # Check for missing http.Response.Body.Close() calls
+    - noctx # Check for missing context.Context in function signatures
+    - sqlclosecheck # Check for missing sql.Rows.Close() calls
+    - exhaustive # Check for exhaustive switch statements
+    - testifylint # Linter for testify
+
+  settings:
+    revive:
+      rules:
+        - name: package-comments
+          disabled: true
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports

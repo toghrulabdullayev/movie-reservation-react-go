@@ -1,0 +1,27 @@
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - master
+            - main
+    pull_request:
+name: Security
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  Gosec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fetch Repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Run Gosec
+        uses: securego/gosec@9e75c0576c9878035d4221392108d458abe10fc3 # master
+        with:
+          args: ./...
