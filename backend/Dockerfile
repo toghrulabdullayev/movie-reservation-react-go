@@ -1,37 +1,42 @@
-# Building the binary of the App
+# ---- Build stage ----
 FROM golang:1.26-alpine AS build
 
-# `boilerplate` should be replaced with your project name
-WORKDIR /go/src/boilerplate
+WORKDIR /go/src/backend
 
-# Copy all the Code and stuff to compile everything
-COPY . .
-
-# Downloads all the dependencies in advance (could be left out, but it's more clear this way)
+# Copy only dependency manifests first — enables Docker layer caching.
+# `go mod download` only re-runs when go.mod/go.sum actually change.
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Builds the application as a staticly linked one, to allow it to run on alpine
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o app .
+# Now copy the rest of the source
+COPY . .
+
+# Build the API binary specifically from cmd/api, not repo root
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+  go build -a -installsuffix cgo -o app ./cmd/api
+
+# Build the seed binary too, if you want it in the image for one-off admin seeding
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+  go build -a -installsuffix cgo -o seed ./cmd/seed
 
 
-# Moving the binary to the 'final Image' to make it smaller
-FROM alpine:latest as release
+# ---- Final stage ----
+FROM alpine:latest AS release
 
 WORKDIR /app
 
-# Create the `public` dir and copy all the assets into it
-RUN mkdir ./static
-COPY ./static ./static
-
-# `boilerplate` should be replaced here as well
-COPY --from=build /go/src/boilerplate/app .
-
-# Add packages
 RUN apk -U upgrade \
-    && apk add --no-cache dumb-init ca-certificates \
-    && chmod +x /app/app
+  && apk add --no-cache dumb-init ca-certificates
 
-# Exposes port 3000 because our program listens on that port
+COPY --from=build /go/src/backend/app .
+COPY --from=build /go/src/backend/seed .
+
+# Needed if you run migrations at startup or the seed script reads SQL files
+COPY migrations ./migrations
+
+RUN chmod +x /app/app /app/seed
+
 EXPOSE 3000
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["./app"]
