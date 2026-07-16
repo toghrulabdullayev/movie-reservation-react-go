@@ -2,7 +2,10 @@ project_name = boilerPlate
 image_name = gofiber:latest
 
 dev:
-	fiber dev
+	fiber dev ./cmd/api/main.go
+
+seed:
+	go run ./cmd/seed/main.go
 
 fmt:
 	golangci-lint fmt
