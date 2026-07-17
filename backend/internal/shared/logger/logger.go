@@ -9,8 +9,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// New configures and returns a new self-contained zerolog.Logger instance.
-// This function does not mutate any global state.
 func New(env string) zerolog.Logger {
 	zerolog.TimeFieldFormat = time.RFC3339
 
@@ -21,7 +19,7 @@ func New(env string) zerolog.Logger {
 			Out:        os.Stdout,
 			TimeFormat: "2006-01-02 15:04:05",
 		}
-		// Set dynamic local log levels if desired, e.g. using level writers.
+		// set dynamic local log levels if desired, e.g. using level writers.
 	} else {
 		writer = os.Stdout
 	}

@@ -1,9 +1,8 @@
-// START OF FILE backend/cmd/api/main.go
 package main
 
 import (
 	"context"
-	"log" // Standard library log for bootstrap fallbacks
+	"log"
 
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/config"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/database"
@@ -12,7 +11,6 @@ import (
 )
 
 func main() {
-	// If run fails (such as failing to load config), we log to stderr and exit
 	if err := run(); err != nil {
 		log.Fatalf("Application startup failed: %v", err)
 	}
@@ -21,17 +19,17 @@ func main() {
 func run() error {
 	ctx := context.Background()
 
-	// 1. Load config (if this fails, it returns back to main's standard logger)
+	// 1. load .env configuration
 	cfg, err := config.Load()
 	if err != nil {
 		return err
 	}
 
-	// 2. Instantiate our structured logger
+	// 2. initialize zerolog logger
 	logInstance := logger.New(cfg.Env)
 	logInstance.Info().Str("env", cfg.Env).Msg("Logger initialized successfully")
 
-	// 3. Connect to PostgreSQL
+	// 3. postgres
 	logInstance.Info().Msg("Connecting to PostgreSQL...")
 	pool, err := database.NewPostgresPool(ctx, cfg.PostgresDSN())
 	if err != nil {
@@ -44,7 +42,7 @@ func run() error {
 		pool.Close()
 	}()
 
-	// 4. Connect to Redis
+	// 4. redis
 	logInstance.Info().Msg("Connecting to Redis...")
 	rdb, err := database.NewRedisClient(ctx, cfg.RedisAddr())
 	if err != nil {
@@ -59,12 +57,10 @@ func run() error {
 		}
 	}()
 
-	// 5. Build and launch server
-	deps := server.BuildDependencies(pool)
+	// 5. build and launch the server
+	deps := server.BuildDependencies(cfg, pool, rdb)
 	srv := server.New(cfg, deps, &logInstance)
 
 	logInstance.Info().Str("port", cfg.Port).Msg("Starting application server...")
-	return srv.Start(func() {
-		logInstance.Info().Msg("Application server started successfully")
-	})
+	return srv.Start()
 }

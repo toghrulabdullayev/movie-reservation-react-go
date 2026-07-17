@@ -25,12 +25,10 @@ func New(cfg *config.Config, deps *Dependencies, log *zerolog.Logger) *Server {
 	return &Server{app: app, cfg: cfg}
 }
 
-func (s *Server) Start(cb func()) error {
-	cb()
+func (s *Server) Start() error {
 	return s.app.Listen(":" + s.cfg.Port)
 }
 
-func (s *Server) Shutdown(cb func()) error {
-	cb()
+func (s *Server) Shutdown() error {
 	return s.app.Shutdown()
 }
