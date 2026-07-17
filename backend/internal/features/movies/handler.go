@@ -1,6 +1,8 @@
 package movies
 
-import "github.com/gofiber/fiber/v3"
+import (
+	"github.com/gofiber/fiber/v3"
+)
 
 type Handler struct {
 	service Service
