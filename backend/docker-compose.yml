@@ -1,32 +1,32 @@
 services:
-  movie-reservation-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: movie-reservation-backend
-    ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/movie_reservation?sslmode=disable
-      - REDIS_URL=redis:6379
-      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
-      - ENV=development
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+  # movie-reservation-backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: movie-reservation-backend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - PORT=3000
+  #     - DATABASE_URL=postgres://postgres:password@postgres:5432/movie_reservation?sslmode=disable
+  #     - REDIS_URL=redis:6379
+  #     - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+  #     - ENV=development
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
 
   postgres:
     image: postgres:18.4
     container_name: movie-reservation-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
       POSTGRES_DB: movie_reservation
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     ports:
       - "5432:5432"
     healthcheck:
@@ -38,13 +38,21 @@ services:
   redis:
     image: redis:8.8
     container_name: movie-reservation-redis
-    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     ports:
       - "6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "--user",
+          "${REDIS_USER:-redis}",
+          "-a",
+          "${REDIS_PASSWORD:-redis}",
+          "ping",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5

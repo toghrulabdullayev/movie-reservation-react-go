@@ -2,7 +2,7 @@ project_name = boilerPlate
 image_name = gofiber:latest
 
 dev:
-	fiber dev ./cmd/api/main.go
+	fiber dev -t ./cmd/api/main.go
 
 seed:
 	go run ./cmd/seed/main.go
