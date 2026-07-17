@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/config"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/database"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/server"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/shared/logger"
+	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/migrations"
 )
 
 func main() {
@@ -41,6 +43,13 @@ func run() error {
 		logInstance.Info().Msg("Closing PostgreSQL connection pool...")
 		pool.Close()
 	}()
+
+	// --- RUN MIGRATIONS HERE ---
+	logInstance.Info().Msg("Running database migrations...")
+	if err := migrations.RunMigrations(ctx, pool); err != nil {
+		return fmt.Errorf("database migrations failed: %w", err)
+	}
+	logInstance.Info().Msg("Database migrations applied successfully")
 
 	// 4. redis
 	logInstance.Info().Msg("Connecting to Redis...")

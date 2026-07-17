@@ -42,7 +42,11 @@ type CreateGenreRequest struct {
 	Name string `json:"name" validate:"required"`
 }
 
-func toMovieResponse(m Movie) MovieResponse {
+func toMovieResponse(m *Movie) MovieResponse {
+	if m == nil {
+		return MovieResponse{}
+	}
+
 	return MovieResponse{
 		ID:          m.ID,
 		DirectorID:  m.DirectorID,

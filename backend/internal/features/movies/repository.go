@@ -30,13 +30,42 @@ func NewRepository(db *pgxpool.Pool) Repository {
 }
 
 func (r *repository) CreateMovie(ctx context.Context, movie *Movie) error {
-	// TODO: actual pgx query, e.g.
-	// _, err := r.db.Exec(ctx, "INSERT INTO movies (...) VALUES (...)", ...)
-	panic("not implemented")
+	query := `
+		INSERT INTO movies (id, director_id, genre_id, title, release_year, rating, plot, duration, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())`
+
+	_, err := r.db.Exec(
+		ctx,
+		query,
+		movie.ID,
+		movie.DirectorID,
+		movie.GenreID,
+		movie.Title,
+		movie.ReleaseYear,
+		movie.Rating,
+		movie.Plot,
+		movie.Duration,
+	)
+
+	return err
 }
 
 func (r *repository) GetMovieByID(ctx context.Context, id uuid.UUID) (*Movie, error) {
-	panic("not implemented")
+	query := `
+		SELECT id, director_id, genre_id, title, release_year, rating, plot, duration, created_at, updated_at 
+		FROM movies 
+		WHERE id = $1`
+
+	var m Movie
+	err := r.db.QueryRow(ctx, query, id).Scan(
+		&m.ID, &m.DirectorID, &m.GenreID, &m.Title,
+		&m.ReleaseYear, &m.Rating, &m.Plot, &m.Duration,
+		&m.CreatedAt, &m.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
 }
 
 func (r *repository) GetAllMovies(ctx context.Context) ([]*Movie, error) {
