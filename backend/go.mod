@@ -3,6 +3,7 @@ module github.com/toghrulabdullayev/movie-reservation-react-go/backend
 go 1.25.0
 
 require (
+	github.com/caarlos0/env/v11 v11.4.1
 	github.com/gofiber/fiber/v3 v3.4.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.10.0

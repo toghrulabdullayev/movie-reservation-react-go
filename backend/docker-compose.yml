@@ -43,16 +43,7 @@ services:
     ports:
       - "6379:6379"
     healthcheck:
-      test:
-        [
-          "CMD",
-          "redis-cli",
-          "--user",
-          "${REDIS_USER:-redis}",
-          "-a",
-          "${REDIS_PASSWORD:-redis}",
-          "ping",
-        ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
