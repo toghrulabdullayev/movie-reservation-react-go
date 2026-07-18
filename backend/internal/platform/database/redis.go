@@ -1,4 +1,3 @@
-// internal/platform/database/redis.go
 package database
 
 import (

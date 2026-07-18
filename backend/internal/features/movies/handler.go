@@ -68,3 +68,21 @@ func (h *Handler) DeleteMovie(c fiber.Ctx) error {
 		"message": "DeleteMovie endpoint",
 	})
 }
+
+func (h *Handler) CreateDirector(c fiber.Ctx) error {
+	var req CreateDirectorRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	createdDirector, err := h.service.CreateDirector(c.Context(), req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to create director",
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(createdDirector)
+}

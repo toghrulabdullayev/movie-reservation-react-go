@@ -1,4 +1,3 @@
-// START OF FILE backend/internal/platform/middleware/logger.go
 package middleware
 
 import (
