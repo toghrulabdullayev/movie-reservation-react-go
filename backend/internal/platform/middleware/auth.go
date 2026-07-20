@@ -9,6 +9,7 @@ import (
 func Auth() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		log.Println("Auth middleware executed")
+		c.Locals("isAuth", true)
 		return c.Next()
 	}
 }

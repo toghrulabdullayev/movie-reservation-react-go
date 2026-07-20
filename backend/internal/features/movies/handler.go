@@ -15,74 +15,36 @@ func NewHandler(service Service) *Handler {
 	}
 }
 
-func (h *Handler) GetMovies(c fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "GetMovies endpoint",
-	})
+func (h *Handler) GetAllMovies(c fiber.Ctx) error {
+	movies, err := h.service.GetAllMovies(c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "failed to retrieve movies",
+		})
+	}
+
+	var response []*MovieResponse
+	for _, m := range movies {
+		response = append(response, toMovieResponse(m))
+	}
+
+	return c.JSON(response)
 }
 
 func (h *Handler) GetMovieByID(c fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid movie ID",
+			"error": "invalid movie ID format",
 		})
 	}
 
 	movie, err := h.service.GetMovieByID(c.Context(), id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Movie not found",
+			"error": "movie not found",
 		})
 	}
 
 	return c.JSON(toMovieResponse(movie))
-}
-
-func (h *Handler) CreateMovie(c fiber.Ctx) error {
-	var req CreateMovieRequest
-	if err := c.Bind().Body(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
-
-	createdMovie, err := h.service.CreateMovie(c.Context(), req)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create movie",
-		})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(toMovieResponse(createdMovie))
-}
-
-func (h *Handler) UpdateMovie(c fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "UpdateMovie endpoint",
-	})
-}
-
-func (h *Handler) DeleteMovie(c fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "DeleteMovie endpoint",
-	})
-}
-
-func (h *Handler) CreateDirector(c fiber.Ctx) error {
-	var req CreateDirectorRequest
-	if err := c.Bind().Body(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
-
-	createdDirector, err := h.service.CreateDirector(c.Context(), req)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create director",
-		})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(createdDirector)
 }

@@ -6,29 +6,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type BaseEntity struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
 type Movie struct {
-	BaseEntity
-	DirectorID  uuid.UUID
-	GenreID     uuid.UUID
-	Title       string
-	ReleaseYear int
-	Rating      float32
-	Plot        string
-	Duration    int
-}
-
-type Director struct {
-	BaseEntity
-	Name string
-}
-
-type Genre struct {
-	BaseEntity
-	Name string
+	ID           uuid.UUID `json:"id"`
+	TMDBID       int       `json:"tmdb_id"`
+	Title        string    `json:"title"`
+	Overview     string    `json:"overview"`
+	PosterPath   string    `json:"poster_path"`
+	BackdropPath string    `json:"backdrop_path"`
+	ReleaseDate  time.Time `json:"release_date"`
+	Runtime      int       `json:"runtime"`
+	VoteAverage  float64   `json:"vote_average"`
+	Genres       []string  `json:"genres,omitempty"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }

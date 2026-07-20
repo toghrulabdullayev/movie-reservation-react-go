@@ -5,19 +5,19 @@ MIGRATION_DIR = ./migrations
 DB_DSN = "postgres://postgres:postgres@localhost:5432/movie_reservation?sslmode=disable"
 
 migration-new: ## Create a new SQL migration file (e.g. make migration-new name=create_users)
-	go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATION_DIR) create $(name) sql
+	go tool goose -dir $(MIGRATION_DIR) create $(name) sql
 
 migration-up: ## Apply migrations locally
-	go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATION_DIR) postgres $(DB_DSN) up
+	go tool goose -dir $(MIGRATION_DIR) postgres $(DB_DSN) up
 
 migration-down: ## Rollback the last migration locally
-	go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATION_DIR) postgres $(DB_DSN) down
+	go tool goose -dir $(MIGRATION_DIR) postgres $(DB_DSN) down
 
 migration-status: ## Check the status of database migrations
-	go run github.com/pressly/goose/v3/cmd/goose@latest -dir $(MIGRATION_DIR) postgres $(DB_DSN) status
+	go tool goose -dir $(MIGRATION_DIR) postgres $(DB_DSN) status
 
 dev:
-	fiber dev -t ./cmd/api/main.go
+	go tool fiber dev -t ./cmd/api/main.go
 
 seed:
 	go run ./cmd/seed/main.go
