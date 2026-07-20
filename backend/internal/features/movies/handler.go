@@ -1,6 +1,8 @@
 package movies
 
 import (
+	"log" // Added standard log import
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 )
@@ -18,6 +20,8 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) GetAllMovies(c fiber.Ctx) error {
 	movies, err := h.service.GetAllMovies(c.Context())
 	if err != nil {
+		log.Printf("[API ERROR] GetAllMovies failed: %v", err)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "failed to retrieve movies",
 		})
@@ -41,6 +45,8 @@ func (h *Handler) GetMovieByID(c fiber.Ctx) error {
 
 	movie, err := h.service.GetMovieByID(c.Context(), id)
 	if err != nil {
+		log.Printf("[API ERROR] GetMovieByID failed: %v", err)
+
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "movie not found",
 		})

@@ -29,8 +29,15 @@ func NewRepository(db *pgxpool.Pool) Repository {
 
 func (r *repository) GetMovieByID(ctx context.Context, id uuid.UUID) (*Movie, error) {
 	query := `
-		SELECT m.id, m.tmdb_id, m.title, m.overview, m.poster_path, m.backdrop_path, m.release_date, m.runtime, m.vote_average, m.created_at, m.updated_at,
-		       COALESCE(array_to_json(array_agg(g.name)) FILTER (WHERE g.name IS NOT NULL), '[]') as genres
+		SELECT m.id, m.tmdb_id, m.title, 
+		       COALESCE(m.overview, '') as overview, 
+		       COALESCE(m.poster_path, '') as poster_path, 
+		       COALESCE(m.backdrop_path, '') as backdrop_path, 
+		       COALESCE(m.release_date, '0001-01-01'::date) as release_date, 
+		       COALESCE(m.runtime, 0) as runtime, 
+		       COALESCE(m.vote_average, 0.0) as vote_average, 
+		       m.created_at, m.updated_at,
+		       COALESCE(array_to_json(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL)), '[]') as genres
 		FROM movies m
 		LEFT JOIN movie_genres mg ON m.id = mg.movie_id
 		LEFT JOIN genres g ON mg.genre_id = g.id
@@ -58,8 +65,15 @@ func (r *repository) GetMovieByID(ctx context.Context, id uuid.UUID) (*Movie, er
 
 func (r *repository) GetAllMovies(ctx context.Context) ([]*Movie, error) {
 	query := `
-		SELECT m.id, m.tmdb_id, m.title, m.overview, m.poster_path, m.backdrop_path, m.release_date, m.runtime, m.vote_average, m.created_at, m.updated_at,
-		       COALESCE(array_to_json(array_agg(g.name)) FILTER (WHERE g.name IS NOT NULL), '[]') as genres
+		SELECT m.id, m.tmdb_id, m.title, 
+		       COALESCE(m.overview, '') as overview, 
+		       COALESCE(m.poster_path, '') as poster_path, 
+		       COALESCE(m.backdrop_path, '') as backdrop_path, 
+		       COALESCE(m.release_date, '0001-01-01'::date) as release_date, 
+		       COALESCE(m.runtime, 0) as runtime, 
+		       COALESCE(m.vote_average, 0.0) as vote_average, 
+		       m.created_at, m.updated_at,
+		       COALESCE(array_to_json(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL)), '[]') as genres
 		FROM movies m
 		LEFT JOIN movie_genres mg ON m.id = mg.movie_id
 		LEFT JOIN genres g ON mg.genre_id = g.id
