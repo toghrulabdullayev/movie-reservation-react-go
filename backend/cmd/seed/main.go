@@ -105,6 +105,13 @@ func run() error {
 	log.Println("Fetching detailed runtime information for movies...")
 	enrichedMovies := fetchMovieDetailsConcurrently(ctx, apiKey, movies, 15) // 15 parallel workers
 
+	// count inserted unique movies out of 1000
+	uniqueIDs := make(map[int]bool)
+	for _, m := range enrichedMovies {
+		uniqueIDs[m.ID] = true
+	}
+	log.Printf("Parsed %d UNIQUE movies out of %d total items fetched\n", len(uniqueIDs), len(enrichedMovies))
+
 	// 6. bulk Insert Movies & Associations inside a Transaction
 	log.Println("Beginning transaction to insert movies...")
 	tx, err := pool.Begin(ctx)

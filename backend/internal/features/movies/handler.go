@@ -22,7 +22,7 @@ func (h *Handler) GetAllMovies(c fiber.Ctx) error {
 	// extract and sanitize page/limit params (defaults to 10 per page, max 100)
 	params := pagination.GetPaginationParams(c, 10, 100)
 
-	// fetch movies and total records from the service
+	// fetch movies and total records
 	moviesList, totalRecords, err := h.service.GetAllMovies(c.Context(), params)
 	if err != nil {
 		log.Printf("[API ERROR] GetAllMovies failed: %v", err)
@@ -37,7 +37,7 @@ func (h *Handler) GetAllMovies(c fiber.Ctx) error {
 		movieDTOs = append(movieDTOs, toMovieResponse(m))
 	}
 
-	// wrap with our generic paginated structure
+	// wrap with paginated structure
 	paginatedResponse := pagination.NewPaginatedResponse(movieDTOs, totalRecords, params)
 
 	return c.JSON(paginatedResponse)

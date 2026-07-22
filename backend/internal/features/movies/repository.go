@@ -65,6 +65,7 @@ func (r *repository) GetMovieByID(ctx context.Context, id uuid.UUID) (*Movie, er
 }
 
 func (r *repository) GetAllMovies(ctx context.Context, params pagination.PaginationParams) ([]*Movie, int, error) {
+	totalRecordsQuery := `SELECT COUNT(*) FROM movies`
 	query := `
 		SELECT m.id, m.tmdb_id, m.title, 
 		       COALESCE(m.overview, '') as overview, 
@@ -74,14 +75,24 @@ func (r *repository) GetAllMovies(ctx context.Context, params pagination.Paginat
 		       COALESCE(m.runtime, 0) as runtime, 
 		       COALESCE(m.vote_average, 0.0) as vote_average, 
 		       m.created_at, m.updated_at,
-		       COALESCE(array_to_json(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL)), '[]') as genres,
-		       COUNT(*) OVER() as total_count
+		       COALESCE(array_to_json(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL)), '[]') as genres
 		FROM movies m
 		LEFT JOIN movie_genres mg ON m.id = mg.movie_id
 		LEFT JOIN genres g ON mg.genre_id = g.id
 		GROUP BY m.id
 		ORDER BY m.release_date DESC
 		LIMIT $1 OFFSET $2`
+
+	totalRecords := 0
+	err := r.db.QueryRow(ctx, totalRecordsQuery).Scan(&totalRecords)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// return an empty slice if there are no records
+	if totalRecords == 0 {
+		return []*Movie{}, 0, nil
+	}
 
 	rows, err := r.db.Query(ctx, query, params.Limit, params.Offset())
 	if err != nil {
@@ -90,7 +101,6 @@ func (r *repository) GetAllMovies(ctx context.Context, params pagination.Paginat
 	defer rows.Close()
 
 	var list []*Movie
-	totalRecords := 0
 
 	for rows.Next() {
 		var m Movie
@@ -99,7 +109,6 @@ func (r *repository) GetAllMovies(ctx context.Context, params pagination.Paginat
 			&m.ID, &m.TMDBID, &m.Title, &m.Overview, &m.PosterPath, &m.BackdropPath,
 			&m.ReleaseDate, &m.Runtime, &m.VoteAverage, &m.CreatedAt, &m.UpdatedAt,
 			&genresJSON,
-			&totalRecords, // reads the total records on each matched row
 		)
 		if err != nil {
 			return nil, 0, err
