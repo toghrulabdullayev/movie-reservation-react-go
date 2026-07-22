@@ -8,13 +8,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/shared/pagination"
 )
 
 var _ Repository = (*repository)(nil)
 
 type Repository interface {
 	GetMovieByID(ctx context.Context, id uuid.UUID) (*Movie, error)
-	GetAllMovies(ctx context.Context) ([]*Movie, error)
+	GetAllMovies(ctx context.Context, params pagination.PaginationParams) ([]*Movie, int, error)
 }
 
 type repository struct {
@@ -63,7 +64,7 @@ func (r *repository) GetMovieByID(ctx context.Context, id uuid.UUID) (*Movie, er
 	return &m, nil
 }
 
-func (r *repository) GetAllMovies(ctx context.Context) ([]*Movie, error) {
+func (r *repository) GetAllMovies(ctx context.Context, params pagination.PaginationParams) ([]*Movie, int, error) {
 	query := `
 		SELECT m.id, m.tmdb_id, m.title, 
 		       COALESCE(m.overview, '') as overview, 
@@ -73,20 +74,24 @@ func (r *repository) GetAllMovies(ctx context.Context) ([]*Movie, error) {
 		       COALESCE(m.runtime, 0) as runtime, 
 		       COALESCE(m.vote_average, 0.0) as vote_average, 
 		       m.created_at, m.updated_at,
-		       COALESCE(array_to_json(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL)), '[]') as genres
+		       COALESCE(array_to_json(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL)), '[]') as genres,
+		       COUNT(*) OVER() as total_count
 		FROM movies m
 		LEFT JOIN movie_genres mg ON m.id = mg.movie_id
 		LEFT JOIN genres g ON mg.genre_id = g.id
 		GROUP BY m.id
-		ORDER BY m.release_date DESC`
+		ORDER BY m.release_date DESC
+		LIMIT $1 OFFSET $2`
 
-	rows, err := r.db.Query(ctx, query)
+	rows, err := r.db.Query(ctx, query, params.Limit, params.Offset())
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
 	var list []*Movie
+	totalRecords := 0
+
 	for rows.Next() {
 		var m Movie
 		var genresJSON []byte
@@ -94,13 +99,14 @@ func (r *repository) GetAllMovies(ctx context.Context) ([]*Movie, error) {
 			&m.ID, &m.TMDBID, &m.Title, &m.Overview, &m.PosterPath, &m.BackdropPath,
 			&m.ReleaseDate, &m.Runtime, &m.VoteAverage, &m.CreatedAt, &m.UpdatedAt,
 			&genresJSON,
+			&totalRecords, // reads the total records on each matched row
 		)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		_ = json.Unmarshal(genresJSON, &m.Genres)
 		list = append(list, &m)
 	}
 
-	return list, nil
+	return list, totalRecords, nil
 }
