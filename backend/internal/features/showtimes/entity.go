@@ -6,29 +6,23 @@ import (
 	"github.com/google/uuid"
 )
 
-type BaseEntity struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
+type ShowtimeStatus string
 
-type Movie struct {
-	BaseEntity
-	DirectorID  uuid.UUID
-	GenreID     uuid.UUID
-	Title       string
-	ReleaseYear int
-	Rating      float32
-	Plot        string
-	Duration    int
-}
+const (
+	Scheduled ShowtimeStatus = "scheduled"
+	Ongoing   ShowtimeStatus = "ongoing"
+	Completed ShowtimeStatus = "completed"
+	Canceled  ShowtimeStatus = "canceled"
+)
 
-type Director struct {
-	BaseEntity
-	Name string
-}
-
-type Genre struct {
-	BaseEntity
-	Name string
+type Showtime struct {
+	ID        uuid.UUID      `json:"id"`
+	MovieID   uuid.UUID      `json:"movie_id"`
+	RoomID    uuid.UUID      `json:"room_id"`
+	StartTime time.Time      `json:"start_time"`
+	EndTime   time.Time      `json:"end_time"`
+	BasePrice float64        `json:"base_price"`
+	Status    ShowtimeStatus `json:"status"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 }

@@ -47,14 +47,14 @@ func (h *Handler) CreateShowtime(c fiber.Ctx) error {
 		})
 	}
 
-	createdMovie, err := h.service.CreateShowtime(c.Context(), req)
+	createdShowtime, err := h.service.CreateShowtime(c.Context(), req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create movie",
+			"error": "Failed to create showtime",
 		})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(toShowtimeResponse(createdMovie))
+	return c.Status(fiber.StatusCreated).JSON(toShowtimeResponse(createdShowtime))
 }
 
 func (h *Handler) UpdateShowtime(c fiber.Ctx) error {
@@ -67,22 +67,4 @@ func (h *Handler) DeleteShowtime(c fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "DeleteShowtime endpoint",
 	})
-}
-
-func (h *Handler) CreateDirector(c fiber.Ctx) error {
-	var req CreateDirectorRequest
-	if err := c.Bind().Body(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
-
-	createdDirector, err := h.service.CreateDirector(c.Context(), req)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create director",
-		})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(createdDirector)
 }
