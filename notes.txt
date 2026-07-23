@@ -1,2 +1,4 @@
 (1) Creating a migration sql file with goose package:
       goose -dir ./backend/migrations create create_movies_table sql
+
+(2) TIMESTAMPTZ -> TIMESTAMP WITH TIME ZONE

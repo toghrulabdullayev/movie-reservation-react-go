@@ -26,3 +26,22 @@ type Showtime struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 }
+
+type ShowtimeSeatStatus string
+
+const (
+	SeatAvailable ShowtimeSeatStatus = "AVAILABLE"
+	SeatHeld      ShowtimeSeatStatus = "HELD"
+	SeatBooked    ShowtimeSeatStatus = "BOOKED"
+	SeatBlocked   ShowtimeSeatStatus = "BLOCKED"
+)
+
+type ShowtimeSeat struct {
+	ID         uuid.UUID          `json:"id"`
+	ShowtimeID uuid.UUID          `json:"showtime_id"`
+	SeatID     uuid.UUID          `json:"seat_id"`
+	Status     ShowtimeSeatStatus `json:"status"`
+	Price      float64            `json:"price"` // calculated base_price * multiplier
+	CreatedAt  time.Time          `json:"created_at"`
+	UpdatedAt  time.Time          `json:"updated_at"`
+}
