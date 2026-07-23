@@ -12,6 +12,13 @@ import (
 	// "github.com/toghrulabdullayev/movie-reservation-react-go/backend/migrations"
 )
 
+// @title Movie Reservation API
+// @version 1.0
+// @description Movie reservation backend written in Go + Fiber.
+// @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	if err := run(); err != nil {
 		log.Fatalf("Application startup failed: %v", err)

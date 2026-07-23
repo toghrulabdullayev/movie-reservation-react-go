@@ -18,6 +18,17 @@ func NewHandler(service Service) *Handler {
 	}
 }
 
+// * Swagger annotations
+// @Summary      Get all movies
+// @Description  Retrieve a paginated list of movies, sorted by release date descending.
+// @Tags         movies
+// @Accept       json
+// @Produce      json
+// @Param        page   query      int  false  "Page number (default: 1)"
+// @Param        limit  query      int  false  "Number of items per page (default: 10, max: 100)"
+// @Success      200    {object}   pagination.PaginatedResponse[MovieResponse]
+// @Failure      500    {object}   map[string]string "Internal Server Error"
+// @Router       /movies [get]
 func (h *Handler) GetAllMovies(c fiber.Ctx) error {
 	// extract and sanitize page/limit params (defaults to 10 per page, max 100)
 	params := pagination.GetPaginationParams(c, 10, 100)
@@ -43,6 +54,18 @@ func (h *Handler) GetAllMovies(c fiber.Ctx) error {
 	return c.JSON(paginatedResponse)
 }
 
+// * Swagger annotations
+// GetMovieByID retrieves a single movie by its UUID.
+// @Summary      Get movie by ID
+// @Description  Retrieve details of a single movie including its associated genres.
+// @Tags         movies
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Movie UUID" format(uuid)
+// @Success      200  {object}  MovieResponse
+// @Failure      400  {object}  map[string]string "Bad Request - Invalid UUID format"
+// @Failure      404  {object}  map[string]string "Not Found - Movie not found"
+// @Router       /movies/{id} [get]
 func (h *Handler) GetMovieByID(c fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {

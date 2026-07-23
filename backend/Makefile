@@ -16,6 +16,13 @@ migration-down: ## Rollback the last migration locally
 migration-status: ## Check the status of database migrations
 	go tool goose -dir $(MIGRATION_DIR) postgres $(DB_DSN) status
 
+swagger:
+	go tool swag init \
+		-g ./cmd/api/main.go \
+		-o ./docs \
+		--parseDependency \
+		--parseInternal
+
 dev:
 	go tool fiber dev -t ./cmd/api/main.go
 

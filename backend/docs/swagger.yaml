@@ -1,0 +1,319 @@
+basePath: /api/v1
+definitions:
+  ? github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginatedResponse-internal_features_movies_MovieResponse
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/internal_features_movies.MovieResponse'
+        type: array
+      metadata:
+        $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginationMetadata'
+    type: object
+  github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginationMetadata:
+    properties:
+      current_page:
+        type: integer
+      page_size:
+        type: integer
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  internal_features_movies.MovieResponse:
+    properties:
+      backdrop_path:
+        type: string
+      genres:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      overview:
+        type: string
+      poster_path:
+        type: string
+      release_date:
+        type: string
+      runtime:
+        type: integer
+      title:
+        type: string
+      tmdb_id:
+        type: integer
+      vote_average:
+        type: number
+    type: object
+  internal_features_showtimes.CreateShowtimeRequest:
+    properties:
+      base_price:
+        type: number
+      end_time:
+        type: string
+      movie_id:
+        type: string
+      room_id:
+        type: string
+      start_time:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_showtimes.ShowtimeStatus'
+    type: object
+  internal_features_showtimes.ShowtimeResponse:
+    properties:
+      base_price:
+        type: number
+      end_time:
+        type: string
+      id:
+        type: string
+      movie_id:
+        type: string
+      room_id:
+        type: string
+      start_time:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_showtimes.ShowtimeStatus'
+    type: object
+  internal_features_showtimes.ShowtimeStatus:
+    enum:
+    - scheduled
+    - ongoing
+    - completed
+    - canceled
+    type: string
+    x-enum-varnames:
+    - Scheduled
+    - Ongoing
+    - Completed
+    - Canceled
+  internal_features_showtimes.UpdateShowtimeRequest:
+    properties:
+      base_price:
+        type: number
+      end_time:
+        type: string
+      movie_id:
+        type: string
+      room_id:
+        type: string
+      start_time:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_showtimes.ShowtimeStatus'
+    type: object
+info:
+  contact: {}
+  description: Movie reservation backend written in Go + Fiber.
+  title: Movie Reservation API
+  version: "1.0"
+paths:
+  /movies:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of movies, sorted by release date descending.
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 10, max: 100)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginatedResponse-internal_features_movies_MovieResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all movies
+      tags:
+      - movies
+  /movies/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of a single movie including its associated genres.
+      parameters:
+      - description: Movie UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_movies.MovieResponse'
+        "400":
+          description: Bad Request - Invalid UUID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Movie not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movie by ID
+      tags:
+      - movies
+  /showtimes:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all showtimes currently registered in the system.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all showtimes
+      tags:
+      - showtimes
+    post:
+      consumes:
+      - application/json
+      description: Create a new showtime entry for a specific movie inside a specific
+        theatre room.
+      parameters:
+      - description: Create showtime payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_showtimes.CreateShowtimeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_showtimes.ShowtimeResponse'
+        "400":
+          description: Bad Request - Invalid payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a showtime
+      tags:
+      - showtimes
+  /showtimes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a scheduled showtime from the database by its ID.
+      parameters:
+      - description: Showtime UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a showtime
+      tags:
+      - showtimes
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the details of a single scheduled showtime by its UUID.
+      parameters:
+      - description: Showtime UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_showtimes.ShowtimeResponse'
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Showtime not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get showtime by ID
+      tags:
+      - showtimes
+    put:
+      consumes:
+      - application/json
+      description: Modify parameters of a scheduled showtime by its ID.
+      parameters:
+      - description: Showtime UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update showtime payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_showtimes.UpdateShowtimeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a showtime
+      tags:
+      - showtimes
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
