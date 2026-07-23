@@ -9,6 +9,15 @@ definitions:
       metadata:
         $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginationMetadata'
     type: object
+  ? github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginatedResponse-internal_features_rooms_RoomResponse
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/internal_features_rooms.RoomResponse'
+        type: array
+      metadata:
+        $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginationMetadata'
+    type: object
   github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginationMetadata:
     properties:
       current_page:
@@ -44,6 +53,41 @@ definitions:
         type: integer
       vote_average:
         type: number
+    type: object
+  internal_features_rooms.CreateRoomRequest:
+    properties:
+      capacity:
+        type: integer
+      columns:
+        type: integer
+      name:
+        type: string
+      rows:
+        type: integer
+    type: object
+  internal_features_rooms.RoomResponse:
+    properties:
+      capacity:
+        type: integer
+      columns:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      rows:
+        type: integer
+    type: object
+  internal_features_rooms.UpdateRoomRequest:
+    properties:
+      capacity:
+        type: integer
+      columns:
+        type: integer
+      name:
+        type: string
+      rows:
+        type: integer
     type: object
   internal_features_showtimes.CreateShowtimeRequest:
     properties:
@@ -174,6 +218,185 @@ paths:
       summary: Get movie by ID
       tags:
       - movies
+  /rooms:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of all rooms.
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 10, max: 100)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginatedResponse-internal_features_rooms_RoomResponse'
+        "500":
+          description: Internal Server Error - Failed to retrieve rooms
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all rooms with pagination
+      tags:
+      - rooms
+    post:
+      consumes:
+      - application/json
+      description: Create a new room with the provided details.
+      parameters:
+      - description: Room details
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_rooms.CreateRoomRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_rooms.RoomResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Failed to create room
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new room
+      tags:
+      - rooms
+  /rooms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a room by its UUID.
+      parameters:
+      - description: Room UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content - Room deleted successfully
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Room not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Failed to delete room
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete room by ID
+      tags:
+      - rooms
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the details of a single room by its UUID.
+      parameters:
+      - description: Room UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_rooms.RoomResponse'
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Room not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get room by ID
+      tags:
+      - rooms
+    put:
+      consumes:
+      - application/json
+      description: Update the details of a room by its UUID.
+      parameters:
+      - description: Room UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated room details
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_rooms.UpdateRoomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_rooms.RoomResponse'
+        "400":
+          description: Bad Request - Invalid input or ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Room not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Failed to update room
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update room by ID
+      tags:
+      - rooms
   /showtimes:
     get:
       consumes:
@@ -183,7 +406,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: Success
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_showtimes.ShowtimeResponse'
+            type: array
+        "500":
+          description: Internal Server Error - Failed to retrieve showtimes
           schema:
             additionalProperties:
               type: string

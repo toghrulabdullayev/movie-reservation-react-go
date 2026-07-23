@@ -16,18 +16,28 @@ func NewHandler(service Service) *Handler {
 }
 
 // * Swagger annotations
-// GetAllShowtimes retrieves all scheduled showtimes.
 // @Summary      Get all showtimes
 // @Description  Get a list of all showtimes currently registered in the system.
 // @Tags         showtimes
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  map[string]string "Success"
+// @Success      200  {array}   ShowtimeResponse
+// @Failure      500  {object}  map[string]string "Internal Server Error - Failed to retrieve showtimes"
 // @Router       /showtimes [get]
 func (h *Handler) GetAllShowtimes(c fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "GetAllShowtimes endpoint",
-	})
+	showtimes, err := h.service.GetAllShowtimes(c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve showtimes",
+		})
+	}
+
+	showtimeResponses := make([]ShowtimeResponse, len(showtimes))
+	for i, showtime := range showtimes {
+		showtimeResponses[i] = toShowtimeResponse(showtime)
+	}
+
+	return c.JSON(showtimeResponses)
 }
 
 // * Swagger annotations
