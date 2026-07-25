@@ -1,8 +1,6 @@
 package movies
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/shared/pagination"
@@ -36,7 +34,6 @@ func (h *Handler) GetAllMovies(c fiber.Ctx) error {
 	// fetch movies and total records
 	moviesList, totalRecords, err := h.service.GetAllMovies(c.Context(), params)
 	if err != nil {
-		log.Printf("[API ERROR] GetAllMovies failed: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "failed to retrieve movies",
 		})
@@ -76,7 +73,6 @@ func (h *Handler) GetMovieByID(c fiber.Ctx) error {
 
 	movie, err := h.service.GetMovieByID(c.Context(), id)
 	if err != nil {
-		log.Printf("[API ERROR] GetMovieByID failed: %v", err)
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "movie not found",
 		})

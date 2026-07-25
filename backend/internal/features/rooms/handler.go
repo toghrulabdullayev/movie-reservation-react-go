@@ -1,8 +1,6 @@
 package rooms
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/shared/pagination"
@@ -92,7 +90,6 @@ func (h *Handler) GetAllRooms(c fiber.Ctx) error {
 
 	rooms, totalRecords, err := h.service.GetAllRooms(c.Context(), params)
 	if err != nil {
-		log.Printf("[API ERROR] GetAllRooms failed: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to retrieve rooms",
 		})

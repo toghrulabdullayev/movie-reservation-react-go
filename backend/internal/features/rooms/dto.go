@@ -18,10 +18,10 @@ type CreateRoomRequest struct {
 }
 
 type UpdateRoomRequest struct {
-	Name     string    `json:"name"`
-	Capacity int       `json:"capacity"`
-	Rows     int       `json:"rows"`
-	Columns  int       `json:"columns"`
+	Name     string `json:"name"`
+	Capacity int    `json:"capacity"`
+	Rows     int    `json:"rows"`
+	Columns  int    `json:"columns"`
 }
 
 func toRoomResponse(r *Room) RoomResponse {

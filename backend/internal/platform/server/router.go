@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	_ "github.com/toghrulabdullayev/movie-reservation-react-go/backend/docs"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/movies"
+	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/reservations"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/rooms"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/seats"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/showtimes"
@@ -31,6 +32,7 @@ func registerRoutes(app *fiber.App, deps *Dependencies) {
 
 	// todo: deps.MovieHandler.RegisterRoutes(v1)
 	movies.RegisterRoutes(v1, deps.MovieHandler)
+	reservations.RegisterRoutes(v1, deps.ReservationHandler)
 	rooms.RegisterRoutes(v1, deps.RoomHandler)
 	seats.RegisterRoutes(v1, deps.SeatHandler)
 	showtimes.RegisterRoutes(v1, deps.ShowtimeHandler)

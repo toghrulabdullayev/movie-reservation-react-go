@@ -9,6 +9,15 @@ definitions:
       metadata:
         $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginationMetadata'
     type: object
+  ? github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginatedResponse-internal_features_reservations_ReservationResponse
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/internal_features_reservations.ReservationResponse'
+        type: array
+      metadata:
+        $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginationMetadata'
+    type: object
   ? github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginatedResponse-internal_features_rooms_RoomResponse
   : properties:
       data:
@@ -53,6 +62,51 @@ definitions:
         type: integer
       vote_average:
         type: number
+    type: object
+  internal_features_reservations.CreateReservationRequest:
+    properties:
+      showtime_id:
+        type: string
+      total_price:
+        type: number
+      user_id:
+        type: string
+    type: object
+  internal_features_reservations.ReservationResponse:
+    properties:
+      id:
+        type: string
+      reserved_at:
+        type: string
+      showtime_id:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_reservations.ReservationStatus'
+      total_price:
+        type: number
+      user_id:
+        type: string
+    type: object
+  internal_features_reservations.ReservationStatus:
+    enum:
+    - PENDING
+    - CONFIRMED
+    - CANCELLED
+    type: string
+    x-enum-varnames:
+    - ReservationPending
+    - ReservationConfirmed
+    - ReservationCancelled
+  internal_features_reservations.UpdateReservationRequest:
+    properties:
+      showtime_id:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_reservations.ReservationStatus'
+      total_price:
+        type: number
+      user_id:
+        type: string
     type: object
   internal_features_rooms.CreateRoomRequest:
     properties:
@@ -315,6 +369,174 @@ paths:
       summary: Get movie by ID
       tags:
       - movies
+  /reservations:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all reservations with pagination.
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        maximum: 100
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_toghrulabdullayev_movie-reservation-react-go_backend_internal_shared_pagination.PaginatedResponse-internal_features_reservations_ReservationResponse'
+        "500":
+          description: Internal Server Error - Failed to retrieve reservations
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all reservations
+      tags:
+      - reservations
+    post:
+      consumes:
+      - application/json
+      description: Create a new reservation with the provided details.
+      parameters:
+      - description: Reservation details
+        in: body
+        name: reservation
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_reservations.CreateReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_reservations.ReservationResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Failed to create reservation
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new reservation
+      tags:
+      - reservations
+  /reservations/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing reservation by its UUID.
+      parameters:
+      - description: Reservation UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Reservation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a reservation
+      tags:
+      - reservations
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the details of a single reservation by its UUID.
+      parameters:
+      - description: Reservation UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_reservations.ReservationResponse'
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Reservation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get reservation by ID
+      tags:
+      - reservations
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing reservation.
+      parameters:
+      - description: Reservation UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated reservation details
+        in: body
+        name: reservation
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_reservations.UpdateReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_reservations.ReservationResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Reservation not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a reservation
+      tags:
+      - reservations
   /rooms:
     get:
       consumes:

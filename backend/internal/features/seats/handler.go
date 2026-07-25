@@ -1,8 +1,6 @@
 package seats
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 )
@@ -46,7 +44,6 @@ func (h *Handler) CreateSeat(c fiber.Ctx) error {
 	}
 
 	if err := h.service.CreateSeat(c.Context(), seat); err != nil {
-		log.Printf("Failed to create seat: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to create seat",
 		})
@@ -77,7 +74,6 @@ func (h *Handler) GetSeatByID(c fiber.Ctx) error {
 
 	seat, err := h.service.GetSeatByID(c.Context(), id)
 	if err != nil {
-		log.Printf("Failed to get seat by ID: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to get seat",
 		})
@@ -104,7 +100,6 @@ func (h *Handler) GetSeatByID(c fiber.Ctx) error {
 func (h *Handler) GetAllSeats(c fiber.Ctx) error {
 	seats, err := h.service.GetAllSeats(c.Context())
 	if err != nil {
-		log.Printf("Failed to get all seats: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to get seats",
 		})
@@ -155,7 +150,6 @@ func (h *Handler) UpdateSeat(c fiber.Ctx) error {
 	}
 
 	if err := h.service.UpdateSeat(c.Context(), seat); err != nil {
-		log.Printf("Failed to update seat: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to update seat",
 		})
@@ -185,7 +179,6 @@ func (h *Handler) DeleteSeat(c fiber.Ctx) error {
 	}
 
 	if err := h.service.DeleteSeat(c.Context(), id); err != nil {
-		log.Printf("Failed to delete seat: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to delete seat",
 		})
@@ -217,7 +210,6 @@ func (h *Handler) GetSeatTypeByID(c fiber.Ctx) error {
 
 	seatType, err := h.service.GetSeatTypeByID(c.Context(), id)
 	if err != nil {
-		log.Printf("Failed to get seat type by ID: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to get seat type",
 		})
@@ -244,7 +236,6 @@ func (h *Handler) GetSeatTypeByID(c fiber.Ctx) error {
 func (h *Handler) GetAllSeatTypes(c fiber.Ctx) error {
 	seatTypes, err := h.service.GetAllSeatTypes(c.Context())
 	if err != nil {
-		log.Printf("Failed to get all seat types: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to get seat types",
 		})
@@ -275,7 +266,6 @@ func (h *Handler) CreateSeatType(c fiber.Ctx) error {
 	seatType.ID = uuid.New()
 
 	if err := h.service.CreateSeatType(c.Context(), &seatType); err != nil {
-		log.Printf("Failed to create seat type: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to create seat type",
 		})
@@ -315,7 +305,6 @@ func (h *Handler) UpdateSeatType(c fiber.Ctx) error {
 	seatType.ID = id
 
 	if err := h.service.UpdateSeatType(c.Context(), &seatType); err != nil {
-		log.Printf("Failed to update seat type: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to update seat type",
 		})
@@ -345,7 +334,6 @@ func (h *Handler) DeleteSeatType(c fiber.Ctx) error {
 	}
 
 	if err := h.service.DeleteSeatType(c.Context(), id); err != nil {
-		log.Printf("Failed to delete seat type: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to delete seat type",
 		})
