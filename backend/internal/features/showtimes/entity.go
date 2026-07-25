@@ -6,13 +6,14 @@ import (
 	"github.com/google/uuid"
 )
 
+// showtimes
 type ShowtimeStatus string
 
 const (
 	Scheduled ShowtimeStatus = "scheduled"
 	Ongoing   ShowtimeStatus = "ongoing"
 	Completed ShowtimeStatus = "completed"
-	Canceled  ShowtimeStatus = "canceled"
+	Canceled  ShowtimeStatus = "cancelled"
 )
 
 type Showtime struct {
@@ -27,13 +28,14 @@ type Showtime struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 }
 
+// showtime seats
 type ShowtimeSeatStatus string
 
 const (
-	SeatAvailable ShowtimeSeatStatus = "AVAILABLE"
-	SeatHeld      ShowtimeSeatStatus = "HELD"
-	SeatBooked    ShowtimeSeatStatus = "BOOKED"
-	SeatBlocked   ShowtimeSeatStatus = "BLOCKED"
+	SeatAvailable ShowtimeSeatStatus = "available"
+	SeatHeld      ShowtimeSeatStatus = "held"
+	SeatBooked    ShowtimeSeatStatus = "booked"
+	SeatBlocked   ShowtimeSeatStatus = "blocked"
 )
 
 type ShowtimeSeat struct {
@@ -41,7 +43,7 @@ type ShowtimeSeat struct {
 	ShowtimeID uuid.UUID          `json:"showtime_id"`
 	SeatID     uuid.UUID          `json:"seat_id"`
 	Status     ShowtimeSeatStatus `json:"status"`
-	Price      float64            `json:"price"` // calculated base_price * multiplier
+	Price      float64            `json:"price"` // base_price * multiplier
 	CreatedAt  time.Time          `json:"created_at"`
 	UpdatedAt  time.Time          `json:"updated_at"`
 }

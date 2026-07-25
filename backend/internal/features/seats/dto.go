@@ -29,8 +29,8 @@ type CreateSeatTypeRequest struct {
 }
 
 type UpdateSeatTypeRequest struct {
-	Name       string  `json:"name"`
-	Multiplier float64 `json:"multiplier"`
+	Name       string    `json:"name"`
+	Multiplier float64   `json:"multiplier"`
 }
 
 type SeatTypeResponse struct {

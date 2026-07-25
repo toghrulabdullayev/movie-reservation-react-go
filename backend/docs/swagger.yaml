@@ -151,6 +151,18 @@ definitions:
       status:
         $ref: '#/definitions/internal_features_showtimes.ShowtimeStatus'
     type: object
+  internal_features_showtimes.CreateShowtimeSeatRequest:
+    properties:
+      price:
+        description: calculated base_price * multiplier
+        type: number
+      seat_id:
+        type: string
+      showtime_id:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_showtimes.ShowtimeSeatStatus'
+    type: object
   internal_features_showtimes.ShowtimeResponse:
     properties:
       base_price:
@@ -168,12 +180,38 @@ definitions:
       status:
         $ref: '#/definitions/internal_features_showtimes.ShowtimeStatus'
     type: object
+  internal_features_showtimes.ShowtimeSeatResponse:
+    properties:
+      id:
+        type: string
+      price:
+        description: calculated base_price * multiplier
+        type: number
+      seat_id:
+        type: string
+      showtime_id:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_showtimes.ShowtimeSeatStatus'
+    type: object
+  internal_features_showtimes.ShowtimeSeatStatus:
+    enum:
+    - available
+    - held
+    - booked
+    - blocked
+    type: string
+    x-enum-varnames:
+    - SeatAvailable
+    - SeatHeld
+    - SeatBooked
+    - SeatBlocked
   internal_features_showtimes.ShowtimeStatus:
     enum:
     - scheduled
     - ongoing
     - completed
-    - canceled
+    - cancelled
     type: string
     x-enum-varnames:
     - Scheduled
@@ -194,6 +232,18 @@ definitions:
         type: string
       status:
         $ref: '#/definitions/internal_features_showtimes.ShowtimeStatus'
+    type: object
+  internal_features_showtimes.UpdateShowtimeSeatRequest:
+    properties:
+      price:
+        description: calculated base_price * multiplier
+        type: number
+      seat_id:
+        type: string
+      showtime_id:
+        type: string
+      status:
+        $ref: '#/definitions/internal_features_showtimes.ShowtimeSeatStatus'
     type: object
 info:
   contact: {}
@@ -907,6 +957,150 @@ paths:
       summary: Update a showtime
       tags:
       - showtimes
+  /showtimes/seats:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all showtime seats currently registered in the system.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_showtimes.ShowtimeSeatResponse'
+            type: array
+        "500":
+          description: Internal Server Error - Failed to retrieve showtime seats
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all showtime seats
+      tags:
+      - showtimes-seats
+    post:
+      consumes:
+      - application/json
+      description: Create a new showtime seat entry for a specific showtime.
+      parameters:
+      - description: Create showtime seat payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_showtimes.CreateShowtimeSeatRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request - Invalid payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a showtime seat
+      tags:
+      - showtimes-seats
+  /showtimes/seats/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a showtime seat from the database by its ID.
+      parameters:
+      - description: Showtime Seat UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a showtime seat
+      tags:
+      - showtimes-seats
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the details of a single showtime seat by its UUID.
+      parameters:
+      - description: Showtime Seat UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_showtimes.ShowtimeSeatResponse'
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Showtime seat not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get showtime seat by ID
+      tags:
+      - showtimes-seats
+    put:
+      consumes:
+      - application/json
+      description: Modify parameters of a showtime seat by its ID.
+      parameters:
+      - description: Showtime Seat UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update showtime seat payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_showtimes.UpdateShowtimeSeatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a showtime seat
+      tags:
+      - showtimes-seats
 securityDefinitions:
   BearerAuth:
     in: header

@@ -946,6 +946,222 @@ const docTemplate = `{
                 }
             }
         },
+        "/showtimes/seats": {
+            "get": {
+                "description": "Get a list of all showtime seats currently registered in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "showtimes-seats"
+                ],
+                "summary": "Get all showtime seats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/internal_features_showtimes.ShowtimeSeatResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Failed to retrieve showtime seats",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new showtime seat entry for a specific showtime.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "showtimes-seats"
+                ],
+                "summary": "Create a showtime seat",
+                "parameters": [
+                    {
+                        "description": "Create showtime seat payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_showtimes.CreateShowtimeSeatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/showtimes/seats/{id}": {
+            "get": {
+                "description": "Retrieve the details of a single showtime seat by its UUID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "showtimes-seats"
+                ],
+                "summary": "Get showtime seat by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Showtime Seat UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_showtimes.ShowtimeSeatResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid ID format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Showtime seat not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Modify parameters of a showtime seat by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "showtimes-seats"
+                ],
+                "summary": "Update a showtime seat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Showtime Seat UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update showtime seat payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_features_showtimes.UpdateShowtimeSeatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a showtime seat from the database by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "showtimes-seats"
+                ],
+                "summary": "Delete a showtime seat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Showtime Seat UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/showtimes/{id}": {
             "get": {
                 "description": "Retrieve the details of a single scheduled showtime by its UUID.",
@@ -1309,6 +1525,24 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_features_showtimes.CreateShowtimeSeatRequest": {
+            "type": "object",
+            "properties": {
+                "price": {
+                    "description": "calculated base_price * multiplier",
+                    "type": "number"
+                },
+                "seat_id": {
+                    "type": "string"
+                },
+                "showtime_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/internal_features_showtimes.ShowtimeSeatStatus"
+                }
+            }
+        },
         "internal_features_showtimes.ShowtimeResponse": {
             "type": "object",
             "properties": {
@@ -1335,13 +1569,49 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_features_showtimes.ShowtimeSeatResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "price": {
+                    "description": "calculated base_price * multiplier",
+                    "type": "number"
+                },
+                "seat_id": {
+                    "type": "string"
+                },
+                "showtime_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/internal_features_showtimes.ShowtimeSeatStatus"
+                }
+            }
+        },
+        "internal_features_showtimes.ShowtimeSeatStatus": {
+            "type": "string",
+            "enum": [
+                "available",
+                "held",
+                "booked",
+                "blocked"
+            ],
+            "x-enum-varnames": [
+                "SeatAvailable",
+                "SeatHeld",
+                "SeatBooked",
+                "SeatBlocked"
+            ]
+        },
         "internal_features_showtimes.ShowtimeStatus": {
             "type": "string",
             "enum": [
                 "scheduled",
                 "ongoing",
                 "completed",
-                "canceled"
+                "cancelled"
             ],
             "x-enum-varnames": [
                 "Scheduled",
@@ -1370,6 +1640,24 @@ const docTemplate = `{
                 },
                 "status": {
                     "$ref": "#/definitions/internal_features_showtimes.ShowtimeStatus"
+                }
+            }
+        },
+        "internal_features_showtimes.UpdateShowtimeSeatRequest": {
+            "type": "object",
+            "properties": {
+                "price": {
+                    "description": "calculated base_price * multiplier",
+                    "type": "number"
+                },
+                "seat_id": {
+                    "type": "string"
+                },
+                "showtime_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/internal_features_showtimes.ShowtimeSeatStatus"
                 }
             }
         }

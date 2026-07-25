@@ -17,6 +17,13 @@ type Repository interface {
 	GetAllShowtimes(ctx context.Context) ([]*Showtime, error)
 	UpdateShowtime(ctx context.Context, showtime *Showtime) error
 	DeleteShowtime(ctx context.Context, id uuid.UUID) error
+
+	// showtime seats
+	CreateShowtimeSeat(ctx context.Context, seat *ShowtimeSeat) error
+	GetShowtimeSeatByID(ctx context.Context, id uuid.UUID) (*ShowtimeSeat, error)
+	GetAllShowtimeSeats(ctx context.Context) ([]*ShowtimeSeat, error)
+	UpdateShowtimeSeat(ctx context.Context, seat *ShowtimeSeat) error
+	DeleteShowtimeSeat(ctx context.Context, id uuid.UUID) error
 }
 
 // concrete implementation — lowercase, unexported
@@ -96,9 +103,110 @@ func (r *repository) GetAllShowtimes(ctx context.Context) ([]*Showtime, error) {
 }
 
 func (r *repository) UpdateShowtime(ctx context.Context, showtime *Showtime) error {
-	panic("not implemented")
+	query := `
+		UPDATE showtimes 
+		SET movie_id = $1, room_id = $2, start_time = $3, end_time = $4, base_price = $5, status = $6, updated_at = NOW() 
+		WHERE id = $7`
+
+	_, err := r.db.Exec(ctx, query,
+		showtime.MovieID,
+		showtime.RoomID,
+		showtime.StartTime,
+		showtime.EndTime,
+		showtime.BasePrice,
+		showtime.Status,
+		showtime.ID,
+	)
+
+	return err
 }
 
 func (r *repository) DeleteShowtime(ctx context.Context, id uuid.UUID) error {
-	panic("not implemented")
+	query := `DELETE FROM showtimes WHERE id = $1`
+	_, err := r.db.Exec(ctx, query, id)
+	return err
+}
+
+func (r *repository) CreateShowtimeSeat(ctx context.Context, seat *ShowtimeSeat) error {
+	query := `
+		INSERT INTO showtime_seats (id, showtime_id, seat_id, status, price, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`
+
+	_, err := r.db.Exec(
+		ctx,
+		query,
+		seat.ID,
+		seat.ShowtimeID,
+		seat.SeatID,
+		seat.Status,
+		seat.Price,
+	)
+
+	return err
+}
+
+func (r *repository) GetShowtimeSeatByID(ctx context.Context, id uuid.UUID) (*ShowtimeSeat, error) {
+	query := `
+		SELECT id, showtime_id, seat_id, status, price, created_at, updated_at 
+		FROM showtime_seats 
+		WHERE id = $1`
+
+	var s ShowtimeSeat
+	err := r.db.QueryRow(ctx, query, id).Scan(
+		&s.ID, &s.ShowtimeID, &s.SeatID, &s.Status, &s.Price, &s.CreatedAt, &s.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &s, nil
+}
+
+func (r *repository) GetAllShowtimeSeats(ctx context.Context) ([]*ShowtimeSeat, error) {
+	query := `SELECT id, showtime_id, seat_id, status, price, created_at, updated_at 
+	FROM showtime_seats`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []*ShowtimeSeat
+
+	for rows.Next() {
+		var s ShowtimeSeat
+		err := rows.Scan(
+			&s.ID, &s.ShowtimeID, &s.SeatID, &s.Status, &s.Price, &s.CreatedAt, &s.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, &s)
+	}
+
+	return list, nil
+}
+
+func (r *repository) UpdateShowtimeSeat(ctx context.Context, seat *ShowtimeSeat) error {
+	query := `
+		UPDATE showtime_seats 
+		SET showtime_id = $1, seat_id = $2, status = $3, price = $4, updated_at = NOW() 
+		WHERE id = $5`
+
+	_, err := r.db.Exec(ctx, query,
+		seat.ShowtimeID,
+		seat.SeatID,
+		seat.Status,
+		seat.Price,
+		seat.ID,
+	)
+
+	return err
+}
+
+func (r *repository) DeleteShowtimeSeat(ctx context.Context, id uuid.UUID) error {
+	query := `DELETE FROM showtime_seats WHERE id = $1`
+	_, err := r.db.Exec(ctx, query, id)
+	return err
 }
