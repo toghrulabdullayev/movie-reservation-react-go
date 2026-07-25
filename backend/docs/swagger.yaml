@@ -89,6 +89,53 @@ definitions:
       rows:
         type: integer
     type: object
+  internal_features_seats.CreateSeatRequest:
+    properties:
+      number:
+        type: integer
+      room_id:
+        type: string
+      row:
+        type: integer
+      seat_type_id:
+        type: string
+    type: object
+  internal_features_seats.CreateSeatTypeRequest:
+    properties:
+      multiplier:
+        type: number
+      name:
+        type: string
+    type: object
+  internal_features_seats.SeatResponse:
+    properties:
+      id:
+        type: string
+      number:
+        type: integer
+      room_id:
+        type: string
+      row:
+        type: integer
+      seat_type_id:
+        type: string
+    type: object
+  internal_features_seats.SeatTypeResponse:
+    properties:
+      id:
+        type: string
+      multiplier:
+        type: number
+      name:
+        type: string
+    type: object
+  internal_features_seats.UpdateSeatTypeRequest:
+    properties:
+      multiplier:
+        type: number
+      name:
+        type: string
+    type: object
   internal_features_showtimes.CreateShowtimeRequest:
     properties:
       base_price:
@@ -397,6 +444,326 @@ paths:
       summary: Update room by ID
       tags:
       - rooms
+  /seats:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all seats.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_seats.SeatResponse'
+            type: array
+        "500":
+          description: Internal Server Error - Failed to get seats
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all seats
+      tags:
+      - seats
+    post:
+      consumes:
+      - application/json
+      description: Create a new seat with the provided details.
+      parameters:
+      - description: Seat details
+        in: body
+        name: seat
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_seats.CreateSeatRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_seats.SeatResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Failed to create seat
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new seat
+      tags:
+      - seats
+  /seats/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a seat by its UUID.
+      parameters:
+      - description: Seat UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Seat not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete seat
+      tags:
+      - seats
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the details of a single seat by its UUID.
+      parameters:
+      - description: Seat UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_seats.SeatResponse'
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Seat not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get seat by ID
+      tags:
+      - seats
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing seat.
+      parameters:
+      - description: Seat UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated seat details
+        in: body
+        name: seat
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_seats.CreateSeatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_seats.SeatResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Seat not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update seat
+      tags:
+      - seats
+  /seats/types:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all seat types.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_seats.SeatTypeResponse'
+            type: array
+        "500":
+          description: Internal Server Error - Failed to get seat types
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all seat types
+      tags:
+      - seat-types
+    post:
+      consumes:
+      - application/json
+      description: Create a new seat type with the provided details.
+      parameters:
+      - description: Seat type details
+        in: body
+        name: seatType
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_seats.CreateSeatTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_seats.SeatTypeResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Failed to create seat type
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new seat type
+      tags:
+      - seat-types
+  /seats/types/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a seat type by its UUID.
+      parameters:
+      - description: Seat Type UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Seat type not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete seat type
+      tags:
+      - seat-types
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the details of a single seat type by its UUID.
+      parameters:
+      - description: Seat Type UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_seats.SeatTypeResponse'
+        "400":
+          description: Bad Request - Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Seat type not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get seat type by ID
+      tags:
+      - seat-types
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing seat type.
+      parameters:
+      - description: Seat Type UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated seat type details
+        in: body
+        name: seatType
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_seats.UpdateSeatTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_seats.SeatTypeResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found - Seat type not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update seat type
+      tags:
+      - seat-types
   /showtimes:
     get:
       consumes:

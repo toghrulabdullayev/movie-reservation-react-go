@@ -9,9 +9,9 @@ import (
 type Seat struct {
 	ID         uuid.UUID `json:"id"`
 	RoomID     uuid.UUID `json:"room_id"`
+	SeatTypeID uuid.UUID `json:"seat_type_id"`
 	Row        int       `json:"row"`
 	Number     int       `json:"number"`
-	SeatTypeID uuid.UUID `json:"seat_type_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }

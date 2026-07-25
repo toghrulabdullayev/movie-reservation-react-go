@@ -5,6 +5,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/movies"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/rooms"
+	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/seats"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/showtimes"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/config"
 )
@@ -12,6 +13,7 @@ import (
 type Dependencies struct {
 	MovieHandler    *movies.Handler
 	RoomHandler     *rooms.Handler
+	SeatHandler     *seats.Handler
 	ShowtimeHandler *showtimes.Handler
 }
 
@@ -24,6 +26,10 @@ func BuildDependencies(cfg *config.Config, pgPool *pgxpool.Pool, rdb *redis.Clie
 	roomService := rooms.NewService(roomRepository)
 	roomHandler := rooms.NewHandler(roomService)
 
+	seatRepository := seats.NewRepository(pgPool)
+	seatService := seats.NewService(seatRepository)
+	seatHandler := seats.NewHandler(seatService)
+
 	showtimeRepository := showtimes.NewRepository(pgPool)
 	showtimeService := showtimes.NewService(showtimeRepository)
 	showtimeHandler := showtimes.NewHandler(showtimeService)
@@ -31,6 +37,7 @@ func BuildDependencies(cfg *config.Config, pgPool *pgxpool.Pool, rdb *redis.Clie
 	return &Dependencies{
 		MovieHandler:    movieHandler,
 		RoomHandler:     roomHandler,
+		SeatHandler:     seatHandler,
 		ShowtimeHandler: showtimeHandler,
 	}
 }
