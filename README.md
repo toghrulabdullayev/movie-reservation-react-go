@@ -2,6 +2,8 @@
 
 A full-stack movie reservation system built with Go (Fiber) and React. The backend provides a RESTful API for managing movies, rooms, seats, showtimes, and reservations with JWT-based authentication and Google OAuth.
 
+Based on the [Movie Reservation System](https://roadmap.sh/projects/movie-reservation-system) project description from roadmap.sh.
+
 ## Prerequisites
 
 - Go 1.25+
