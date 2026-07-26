@@ -1,4 +1,3 @@
-// START OF FILE backend/internal/shared/logger/logger.go
 package logger
 
 import (
