@@ -17,4 +17,3 @@ func RegisterRoutes(router fiber.Router, handler *Handler) {
 	reservations.Put("/:id", handler.UpdateReservation)
 	reservations.Delete("/:id", handler.DeleteReservation)
 }
-

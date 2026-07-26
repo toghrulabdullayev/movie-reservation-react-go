@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/contrib/v3/swaggo"
 	"github.com/gofiber/fiber/v3"
 	_ "github.com/toghrulabdullayev/movie-reservation-react-go/backend/docs"
+	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/auth"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/movies"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/reservations"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/rooms"
@@ -31,6 +32,7 @@ func registerRoutes(app *fiber.App, deps *Dependencies) {
 	// protected := v1.Group("", middleware.Auth()) //! auth protects all /api/v1 routes
 
 	// todo: deps.MovieHandler.RegisterRoutes(v1)
+	auth.RegisterRoutes(v1, deps.AuthHandler)
 	movies.RegisterRoutes(v1, deps.MovieHandler)
 	reservations.RegisterRoutes(v1, deps.ReservationHandler)
 	rooms.RegisterRoutes(v1, deps.RoomHandler)

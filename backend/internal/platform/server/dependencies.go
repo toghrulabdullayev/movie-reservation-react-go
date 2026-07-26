@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
+	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/auth"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/movies"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/reservations"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/features/rooms"
@@ -12,6 +13,9 @@ import (
 )
 
 type Dependencies struct {
+	Config *config.Config
+
+	AuthHandler        *auth.Handler
 	MovieHandler       *movies.Handler
 	ReservationHandler *reservations.Handler
 	RoomHandler        *rooms.Handler
@@ -20,6 +24,10 @@ type Dependencies struct {
 }
 
 func BuildDependencies(cfg *config.Config, pgPool *pgxpool.Pool, rdb *redis.Client) *Dependencies {
+	authRepository := auth.NewRepository(pgPool)
+	authService := auth.NewService(authRepository, rdb, cfg)
+	authHandler := auth.NewHandler(authService, cfg)
+
 	movieRepository := movies.NewRepository(pgPool)
 	movieService := movies.NewService(movieRepository)
 	movieHandler := movies.NewHandler(movieService)
@@ -41,6 +49,9 @@ func BuildDependencies(cfg *config.Config, pgPool *pgxpool.Pool, rdb *redis.Clie
 	showtimeHandler := showtimes.NewHandler(showtimeService)
 
 	return &Dependencies{
+		Config: cfg,
+
+		AuthHandler:        authHandler,
 		MovieHandler:       movieHandler,
 		ReservationHandler: reservationHandler,
 		RoomHandler:        roomHandler,

@@ -17,6 +17,7 @@ import (
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/config"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/internal/platform/database"
 	"github.com/toghrulabdullayev/movie-reservation-react-go/backend/migrations"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // TMDB API Response Structures
@@ -77,6 +78,12 @@ func run() error {
 	log.Println("Applying database migrations...")
 	if err := migrations.RunMigrations(ctx, pool); err != nil {
 		return fmt.Errorf("failed to apply migrations before seeding: %w", err)
+	}
+
+	// seed default admin account if not present
+	log.Println("Verifying administrator profile presence...")
+	if err := seedDefaultAdmin(ctx, pool); err != nil {
+		return fmt.Errorf("failed to seed default admin: %w", err)
 	}
 
 	// 3. fetch and Seed Genres
@@ -371,5 +378,34 @@ func insertMovie(ctx context.Context, tx pgx.Tx, m TMDBMovie, genreMap map[int]u
 		}
 	}
 
+	return nil
+}
+
+func seedDefaultAdmin(ctx context.Context, pool *pgxpool.Pool) error {
+	var exists bool
+	err := pool.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM users WHERE role = 'admin')").Scan(&exists)
+	if err != nil {
+		return err
+	}
+	if exists {
+		log.Println("Administrator account already exists. Skipping seed step.")
+		return nil
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte("Admin123!"), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	query := `
+		INSERT INTO users (id, username, email, password_hash, role, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+	`
+	_, err = pool.Exec(ctx, query, uuid.New(), "admin", "admin@admin.com", string(passwordHash), "admin")
+	if err != nil {
+		return fmt.Errorf("failed to create default admin account: %w", err)
+	}
+
+	log.Println("Default administrator account successfully registered! (Username: admin, Email: admin@admin.com)")
 	return nil
 }

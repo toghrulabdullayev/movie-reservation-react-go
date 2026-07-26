@@ -15,6 +15,15 @@ type Config struct {
 	PostgresDB       string `env:"POSTGRES_DB,required"`
 	RedisHost        string `env:"REDIS_HOST,required"`
 	RedisPort        string `env:"REDIS_PORT,required"`
+
+	// auth
+	GoogleClientID     string `env:"GOOGLE_CLIENT_ID,required"`
+	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET,required"`
+	GoogleRedirectURL  string `env:"GOOGLE_REDIRECT_URL,required"`
+	JWTSecret          string `env:"JWT_SECRET,required"`
+	JWTRefreshSecret   string `env:"JWT_REFRESH_SECRET,required"`
+	CookieDomain       string `env:"COOKIE_DOMAIN,required"`
+	ClientRedirectURL  string `env:"CLIENT_REDIRECT_URL,required"` // frontend target url
 }
 
 func (c *Config) PostgresDSN() string {
