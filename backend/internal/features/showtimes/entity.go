@@ -22,7 +22,7 @@ type Showtime struct {
 	RoomID    uuid.UUID      `json:"room_id"`
 	StartTime time.Time      `json:"start_time"`
 	EndTime   time.Time      `json:"end_time"`
-	BasePrice float64        `json:"base_price"`
+	BasePrice float64        `json:"base_price"` // should be in cents (int)
 	Status    ShowtimeStatus `json:"status"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

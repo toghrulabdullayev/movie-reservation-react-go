@@ -18,7 +18,12 @@ func New(cfg *config.Config, deps *Dependencies, log *zerolog.Logger) *Server {
 	app := fiber.New(fiber.Config{})
 	app.Use(recover.New())
 	app.Use(middleware.Logger(log)) // custom zerolog middleware
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowCredentials: true,
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	}))
 
 	registerRoutes(app, deps)
 
